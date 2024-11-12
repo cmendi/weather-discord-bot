@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const { request } = require("undici");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -19,8 +18,8 @@ module.exports = {
 
 		const query = new URLSearchParams({ term });
 
-		const dictResult = await request(`https://api.urbandictionary.com/v0/define?${query}`);
-		const { list } = await dictResult.body.json();
+		const dictResult = await fetch(`https://api.urbandictionary.com/v0/define?${query}`);
+		const { list } = await dictResult.json();
 
 		if (!list.length) {
 			return interaction.editReply(`No results found for **${term}**.`);
