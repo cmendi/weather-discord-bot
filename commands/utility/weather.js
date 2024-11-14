@@ -5,17 +5,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("weather")
 		.setDescription("Provides information about your local weather")
-		.addStringOption((option) => option.setName("city").setDescription("Enter City Name").setRequired(true))
-		.addStringOption((option) => option.setName("state").setDescription("Enter State Name").setRequired(false)),
+		.addStringOption((option) => option.setName("city").setDescription("Enter City Name").setRequired(true)),
 
 	async execute(interaction) {
 		await interaction.deferReply();
 
 		const city = interaction.options.getString("city");
 		console.log(city);
-		const state = interaction.options.getString("state");
 		const cityQuery = encodeURIComponent(city);
-		const stateQuery = encodeURIComponent(state);
 
 		const weatherResults = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityQuery}&appid=${process.env.WEATHER_API_KEY}`);
 		const list = await weatherResults.json();
