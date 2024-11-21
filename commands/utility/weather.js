@@ -18,8 +18,11 @@ module.exports = {
 		const list = await weatherResults.json();
 		const lon = list.coord.lon;
 		const lat = list.coord.lat;
+		const forecastResults = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.WEATHER_API_KEY}`);
+		const forecastList = await forecastResults.json();
 		const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${lon},${lat},9.07,0/300x200?access_token=${process.env.MAP_API_KEY}`;
 		const tempEmoji = (((list.main.temp - 273.15) * 9) / 5 + 32).toFixed(2) < 55 ? "❄️" : "☀️";
+
 		let cloudEmoji = "";
 		let percipEmoji = "";
 		let cardColor = 0;
@@ -56,12 +59,16 @@ module.exports = {
 			.setImage(mapUrl)
 			.setTitle(`Current weather for ${list.name}`)
 			.addFields(
-				{ name: `Temp ${tempEmoji}`, value: `${(((list.main.temp - 273.15) * 9) / 5 + 32).toFixed(2)}°F` },
-				{ name: `Feels Like ${tempEmoji}`, value: `${(((list.main.feels_like - 273.15) * 9) / 5 + 32).toFixed(2)}°F` },
-				{ name: `Humidity ${percipEmoji}`, value: `${list.main.humidity}%` },
-				{ name: `Clouds ${cloudEmoji}`, value: `${list.clouds.all}%` },
-				{ name: "Wind", value: `${list.wind.speed} Mph` }
-			);
+				{ name: `**Population**`, value: `${forecastList.city.population.toLocaleString()}` },
+				{ name: `**Temp** ${tempEmoji}`, value: `${(((list.main.temp - 273.15) * 9) / 5 + 32).toFixed(2)}°F` },
+				{ name: `**Feels Like** ${tempEmoji}`, value: `${(((list.main.feels_like - 273.15) * 9) / 5 + 32).toFixed(2)}°F` },
+				{ name: `**Humidity** ${percipEmoji}`, value: `${list.main.humidity}%` },
+				{ name: `**Clouds** ${cloudEmoji}`, value: `${list.clouds.all}%` },
+				{ name: "**Wind**", value: `${list.wind.speed} Mph` }
+			)
+			.setFooter({ text: "Data provided by OpenWeatherMap" })
+			.setTimestamp()
+			.setThumbnail("https://openweathermap.org/img/wn/01d.png");
 
 		interaction.editReply({ embeds: [embed] });
 	},
